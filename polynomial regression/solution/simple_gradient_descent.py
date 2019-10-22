@@ -130,15 +130,15 @@ plt.show()
 #
 # # Step 6: Predict the price of house
 # # You have to select the best theta you found
-# theta = # YOUR CODE GOES HERE
-# predict_price = # YOUR CODE GOES HERE
+theta = theta_matrix[4,:]
+predict_price = np.matmul(x_test_scaled, theta)
 #
-# # calculate the cost for the test set
-# test_cost = # YOUR CODE GOES HERE
-# print('test cost: ',test_cost)
-#
-# # plot the ground truth and the predicted
-# x_axis = np.linspace(1,len(y_test),len(y_test))
-# plt.plot(x_axis,y_test,'b',x_axis,predict_price,'r')
-# plt.legend(('Ground truth','Predicted'))
-# plt.show()
+# calculate the cost for the test set
+test_cost = compute_cost(x_test_scaled, y_test, theta)
+print('test cost: ', test_cost)
+
+# plot the ground truth and the predicted
+x_axis = np.linspace(1,len(y_test),len(y_test))
+plt.plot(x_axis,y_test,'b',x_axis,predict_price,'r')
+plt.legend(('Ground truth','Predicted'))
+plt.show()
