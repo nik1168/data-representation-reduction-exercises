@@ -79,7 +79,6 @@ J = np.zeros(N_iterations)
 
 # initialize new parameters using random distribution
 theta_sgd = 0.5 * np.random.randn(x_train_scaled.shape[1])
-idx = 0
 c = 0
 for step in range(N_iterations):
     if step % num_samples == 0:
@@ -89,8 +88,8 @@ for step in range(N_iterations):
         c = 0
     idx = step - int(step / num_samples) * num_samples
     # select the next sample to train
-    x_step = x_train_scaled[idx]
-    y_step = y_train[idx]
+    x_step = x_train_scaled[c]
+    y_step = y_train[c]
     x_step = x_step.reshape([1, -1])
     c += 1
 
@@ -106,6 +105,49 @@ J_train = compute_cost(x_train_scaled, y_train, theta_sgd)
 print('training cost: %f' % J_train)
 # plot cost function
 plt.plot(J)
+plt.title("Stochastic")
+plt.xlabel('Training step')
+plt.ylabel('Cost')
+plt.show()
+
+
+
+# Step 6: mini batch gradient descent
+# calculate cost value and update theta
+
+# initialize new parameters using random distribution
+theta_sgd_mini = 0.5 * np.random.randn(x_train_scaled.shape[1])
+idx = 0
+c = 0
+batch = 3
+n_batch = int(num_samples/batch)
+N_iterations_mini = (n_batch) * 20
+J_mini = np.zeros(N_iterations_mini)
+for step in range(int(N_iterations_mini)):
+    if step % n_batch == 0:
+        # shuffle the training data (must be done the same way for data and targets)
+        # YOUR CODE GOES HERE
+        x_train_scaled, y_train = shuffle(x_train_scaled, y_train, random_state=0)
+        c = 0
+    # idx = step - int(step / num_samples) * num_samples
+    # select the next sample to train
+    x_step = x_train_scaled[c:c+batch]
+    y_step = y_train[c:c+batch]
+    c += batch
+
+    # calculate the cost on x_step and y_step
+    J_mini[step] = compute_cost(x_step, y_step, theta_sgd_mini)
+
+    # update theta using a x_step and y_step
+    grad = compute_gradient(x_step, y_step, theta_sgd_mini)
+    theta_sgd_mini = theta_sgd_mini - (learning_rate * grad)
+
+# calculate the loss on the whole training set
+J_train_mini = compute_cost(x_train_scaled, y_train, theta_sgd_mini)
+print('training cost: %f mini batch' % J_train_mini)
+# plot cost function
+plt.plot(J_mini)
+plt.title("Mini batch")
 plt.xlabel('Training step')
 plt.ylabel('Cost')
 plt.show()
