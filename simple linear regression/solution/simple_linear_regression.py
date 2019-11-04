@@ -33,8 +33,8 @@ def get_theta_2(x1, y, theta_1):
 
 
 # Write your code below
-theta_1 = get_theta_1(x, y)
-theta_0 = get_theta_2(x, y, theta_1)
+theta_1 = get_theta_1(x, y_noise)
+theta_0 = get_theta_2(x, y_noise, theta_1)
 #
 z = theta_0 + theta_1 * x
 #
