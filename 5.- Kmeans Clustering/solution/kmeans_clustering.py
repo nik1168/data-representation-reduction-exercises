@@ -166,7 +166,9 @@ from sklearn.cluster import KMeans
 
 num_clusters = 5
 cluster_labels, centroids = kmeans(X, 5)
-
+# kmeans = KMeans(n_clusters=5, random_state=0).fit(X)
+# cluster_labels = kmeans.labels_
+# centroids = kmeans.cluster_centers_
 labels = ["cluster_" + str(x) for x in range(num_clusters)]
 population = [np.sum(cluster_labels == x) for x in range(num_clusters)]
 y_pos = np.arange(len(labels))
@@ -199,5 +201,5 @@ plt.show()
 
 ## Step 4: Calculate Silhouette score
 
-# score = silhouette_score (X, labels, metric='euclidean')
-# print("Score: ", score)
+score = silhouette_score(X, cluster_labels)
+print("Score: ", score)
