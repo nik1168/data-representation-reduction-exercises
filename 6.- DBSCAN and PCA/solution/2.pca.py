@@ -34,4 +34,10 @@ plt.show()
 plt.imshow(C)
 plt.show()
 
+pca = PCA()
+Y_PCA = pca.fit_transform(X_normalized)
+print("Shape Y_PCA: ",Y_PCA.shape)
+plt.imshow((1.0/n_samples) * np.dot(Y_PCA.T,Y_PCA))
+plt.show()
+
 
