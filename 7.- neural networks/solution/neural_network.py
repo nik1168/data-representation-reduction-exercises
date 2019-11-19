@@ -8,7 +8,6 @@ from sklearn.preprocessing import LabelEncoder
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.metrics import mean_squared_error, mean_absolute_error
 
-
 # load digits dataset with 5 classes. The dataset has 10 classes in total.
 # You can change the amount of data as you like.
 
@@ -62,15 +61,19 @@ so that you can stack them sequentially as layers to build your own neural netwo
 the fully connected layer and the sigmoid activation function.
  In each function, we will return the result and the cache the input for backward computation later
 """
+
+
 def sigmoid(x):
     cache = x
-    result = 1.0/(1 + np.exp(-x))
+    result = 1.0 / (1 + np.exp(-x))
     return cache, result
+
 
 def fully_connected(x, theta):
     cache = (x, theta)
     result = np.matmul(x, theta)
     return cache, result
+
 
 # After having our building blocks, we can start stacking layers.
 def compute_forward(x, theta_matrices):
@@ -85,26 +88,29 @@ def compute_forward(x, theta_matrices):
     '''
     result = x
     cache = dict()
-    for i, theta in enumerate(theta_matrices) :
-        cache_layer, fully_connected_layer = fully_connected(result,theta)
+    for i, theta in enumerate(theta_matrices):
+        cache_layer, fully_connected_layer = fully_connected(result, theta)
         cache_sigmoid_layer, sigmoid_to_layer = sigmoid(fully_connected_layer)
-        cache['fc'+str(i)+''] = cache_layer
-        cache['sigmoid'+str(i)+''] = sigmoid_to_layer
+        cache['fc' + str(i) + ''] = cache_layer
+        cache['sigmoid' + str(i) + ''] = sigmoid_to_layer
         result = sigmoid_to_layer
     ## Your code here, should be a result of a fully_connected layer then a sigmoid activation.
     # Store the result of each computation in cache, for doing backprop later.
     # For this exercise, cache should have four items with keys: fc0, sigmoid0, fc1, sigmoid1
     return cache, result
 
+
 def compute_cost(outputs, labels):
     '''mean square error'''
     result = mean_squared_error(labels, outputs)
     return result
-#%%
+
+
+# %%
 
 num_hidden = 100
-theta0 = np.random.normal(loc=0., scale=0.5, size=(n_features+1, num_hidden+1)) # + 1 for bias term
-theta1 = np.random.normal(loc=0., scale=0.5, size=(num_hidden+1, num_classes))
+theta0 = np.random.normal(loc=0., scale=0.5, size=(n_features + 1, num_hidden + 1))  # + 1 for bias term
+theta1 = np.random.normal(loc=0., scale=0.5, size=(num_hidden + 1, num_classes))
 theta_matrices = [theta0, theta1]
 cache, initial_outputs = compute_forward(x_train, theta_matrices)
 assert initial_outputs.shape == y_train_onehot.shape, 'forward pass returns wrong shape'
@@ -119,3 +125,28 @@ Similar to forward pass, calculating backward gradient using backpropagation
 is just like stacking several layers of gradient together. 
 To do so, we first need to calculate the gradient of each of our building blocks.
 """
+
+
+def fc_backward(cache, result):
+    x, theta = cache
+    theta_grad = x.T.dot(result)
+    x_grad = result.dot(theta.T)
+    return x_grad, theta_grad
+
+
+def cost_backward(outputs, labels):
+    h = outputs
+    pass
+
+
+def compute_backprop(x, theta_matrices, cache, outputs, labels):
+    '''
+    return gradients for theta_matrices
+    '''
+    theta_grad = {}  # should include two key theta0 and theta1 for this exercise
+    grad = cost_backward(outputs, labels)
+    for i, theta in enumerate(theta_matrices[::-1]):
+        layer = len(theta_matrices) - i - 1  # first iteration: layer 1, second iter: layer 0
+        # Your code, first you need to propagate the gradient through the sigmoid activation,
+        # then through the fully_connected layer
+    return theta_grad
