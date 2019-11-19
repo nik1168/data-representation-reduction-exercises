@@ -13,6 +13,7 @@ import matplotlib.pyplot as plt
 import math
 from sklearn.metrics import accuracy_score
 
+
 # load the dataset
 data = load_breast_cancer()
 x = data.data
