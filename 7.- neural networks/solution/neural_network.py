@@ -7,6 +7,7 @@ import numpy as np
 from sklearn.preprocessing import LabelEncoder
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.metrics import mean_squared_error, mean_absolute_error
+from sklearn.metrics import accuracy_score
 
 # load digits dataset with 5 classes. The dataset has 10 classes in total.
 # You can change the amount of data as you like.
@@ -134,19 +135,96 @@ def fc_backward(cache, result):
     return x_grad, theta_grad
 
 
+def sigmoid_backward(cache, result):
+    x = cache
+    sigmoid_grad = sigmoid(x)[1] * (1 - sigmoid(x)[1])
+    return sigmoid_grad * result
+
+
 def cost_backward(outputs, labels):
-    h = outputs
-    pass
+    # Derivative of block of cost_backward function
+    result = -(labels - outputs)
+    return result
 
 
 def compute_backprop(x, theta_matrices, cache, outputs, labels):
     '''
     return gradients for theta_matrices
     '''
-    theta_grad = {}  # should include two key theta0 and theta1 for this exercise
+    theta_grad = {
+        'theta0': None,
+        'theta1': None
+    }  # should include two key theta0 and theta1 for this exercise
     grad = cost_backward(outputs, labels)
     for i, theta in enumerate(theta_matrices[::-1]):
         layer = len(theta_matrices) - i - 1  # first iteration: layer 1, second iter: layer 0
         # Your code, first you need to propagate the gradient through the sigmoid activation,
         # then through the fully_connected layer
+        res_sig_back = sigmoid_backward(cache['sigmoid' + str(layer)], grad)
+        xgrad, res_fc_backward = fc_backward(cache['fc' + str(layer)], res_sig_back)
+        grad = xgrad
+        theta_grad['theta' + str(layer)] = res_fc_backward
+
     return theta_grad
+
+
+#### Check if compute_backprop returns the right shape
+theta_grad = compute_backprop(x_train, theta_matrices, cache, initial_outputs, y_train_onehot)
+dtheta0 = theta_grad['theta0']
+assert dtheta0.shape == theta0.shape, 'backprop returns wrong shape for theta 0'
+dtheta1 = theta_grad['theta1']
+assert dtheta1.shape == theta1.shape, 'backprop returns wrong shape for theta 1'
+
+# %% md
+
+## Step 4: Training the network
+
+# %% md
+
+# Now that you have both forward and backward computation, use batch gradient descent to train the network.
+alpha = 0.001  # learning rate
+N_iterations = 200  # You can play with this one to see how the network performs
+J = np.zeros(N_iterations)
+
+for i in range(N_iterations):
+    ## Your code
+    # First, do a forward pass
+    cache, initial_outputs = compute_forward(x_train, theta_matrices)
+
+    # Calculate the cost and store it in J[i]
+    cost = compute_cost(initial_outputs, y_train_onehot)
+    print("cost it: " + str(i))
+    print(cost)
+    J[i] = cost
+
+    # Calculate the gradients by doing a backward pass
+    gradients = compute_backprop(x_train, theta_matrices, cache, initial_outputs, y_train_onehot)
+
+    # Update the weights by gradient descent rule
+    theta_matrices[0] = theta_matrices[0] - alpha * gradients['theta0']
+    theta_matrices[1] = theta_matrices[1] - alpha * gradients['theta1']
+
+J_train = compute_cost(compute_forward(x_train, theta_matrices)[1], y_train_onehot)
+print('training cost: %f' % J_train)
+
+# plot cost function
+plt.plot(J)
+plt.xlabel('Training step')
+plt.ylabel('Cost')
+plt.show()
+
+
+## Step 5: Evaluation
+# Your accuracy on test set should be greater than 90%
+
+def compute_accuracy(y_ground_truth, y_pred):
+    return accuracy_score(y_ground_truth, y_pred)
+
+
+pred_one_max = compute_forward(x_test, theta_matrices)[1]
+print("Prediction")
+
+pred = np.array(list(map(lambda pred: np.argmax(pred), pred_one_max)))
+# Your prediction would be an one-hot vector, for each test sample, select the one with the highest probablity to assign the class
+accuracy = compute_accuracy(y_test, pred)
+print('accuracy: ', accuracy)
