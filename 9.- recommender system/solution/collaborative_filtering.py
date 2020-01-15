@@ -77,10 +77,12 @@ def compute_cost(X, THETA, Y, _lambda, mask):
     for i in range(n_m):
         for k in range(n_features):
             sum2 = sum2 + (X[i][k]) ** 2
+            # sum2 = sum2 + (X[k][i]) ** 2
 
     for i in range(n_u):
         for k in range(n_features):
             sum3 = sum3 + (X[i][k]) ** 2
+            # sum3 = sum3 + (X[k][i]) ** 2
 
     return ((1 / 2) * sum1) + ((_lambda / 2) * sum2) + ((_lambda / 2) * sum3)
 
@@ -97,9 +99,20 @@ def compute_gradient(X, THETA, Y, _lambda, mask):
     assert X.shape[0] == Y.shape[0]
     assert THETA.shape[0] == Y.shape[1]
     assert Y.shape == mask.shape
-    grad_X = X - np.dot(alpha, np.dot(np.dot((np.dot(THETA.T, X) - Y), THETA), mask) + np.dot(_lambda, X))
-    grad_THETA = THETA - np.dot(alpha,
-                                np.dot(np.dot((np.dot(THETA.T, X) - Y), X), mask) + np.dot(_lambda, THETA))
+
+    predicted_minus_ground = np.matmul(X, THETA.T) - Y
+    # predicted_minus_ground_x = np.matmul(THETA, X.T) - Y.T
+    a = predicted_minus_ground * mask
+    # a_x = predicted_minus_ground_x * mask
+    # X
+    t_times_predicted_minus_ground = np.matmul(a, THETA)
+    add_lambda = t_times_predicted_minus_ground + (_lambda * X)
+    grad_X = X - (alpha * add_lambda)
+
+    # theta
+    t_times_predicted_minus_ground = np.matmul(a.T, X)
+    add_lambda = t_times_predicted_minus_ground + (_lambda * THETA)
+    grad_THETA = THETA - (alpha * add_lambda)
     return (grad_X, grad_THETA)
 
 
@@ -130,3 +143,18 @@ while counter < training_epochs:
     # increase counter
     counter += 1
     print("epoch:", counter, "cost: ", cost)
+
+## Step 4: Make prediction
+
+#%%
+prediction = np.matmul(MOVIE_FEATURES, USER_FEATURES.T)
+
+
+# Compute RMSE and MAE on the training set
+print("RMSE_train: ",RMSE(data_train,prediction,mask))
+print("MAE_train: ",MAE(data_train,prediction,mask))
+
+# Compute RMSE and MAE on the testing set
+mask_test = create_mask(data_test)
+print("RMSE_test: ",RMSE(data_test,prediction,mask_test))
+print("MAE_test: ",MAE(data_test,prediction,mask_test))
