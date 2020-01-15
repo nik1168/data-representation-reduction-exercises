@@ -1,2 +1,2 @@
-# data-representation-reduction-exercises
-Exercises from laboratories from the course Data Representation Reduction and Analysis
+# Data Representation Reduction Exercises
+Some machine learning algorithms implemented from scratch
